@@ -1,18 +1,9 @@
 package emotionAnalyzer;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,10 +33,7 @@ public class EmotionAnalyzer {
 	 * Collection of files which should be processed
 	 */
 	private File[] corpus;
-	/**
-	 * Folder in which the corpus (every txt-document in it) is lokated.
-	 */
-	private File corpusFolder;
+	
 	private Vocabulary vocabulary;
 	private Settings settings;
 	public Vocabulary getVocabulary() {
@@ -53,20 +41,8 @@ public class EmotionAnalyzer {
 	}
 
 	int[] documentTermVectors;
-	private DocumentContainer[] containers;	
-	private MemoryContainer[] containersMemory;
-	
-	private File normalizedDocumentFolder;
+	private MemoryContainer[] containersMemory;	
 	private File documentTermVectorFolder;
-	private File VocabularyFolder;
-
-	private String normalizedDocument;
-	private InputStream documentTermVectorStream;
-	private InputStream VocabularyStream;
-	/**
-	 * The Folder where the additional output is saved.
-	 */
-	private File targetFolder;
 
 	private int[] vocabularyLexiconVector; // used for lexiconProjection. Components are 0 if the word
 											// represented by this index is not in the lexicon
@@ -95,10 +71,7 @@ public class EmotionAnalyzer {
 		
 	public MemoryContainer[] analyze(InputStream givenCorpus)
 	throws Exception{
-		this.vocabulary = null;		
-		this.containers = null;
-		this.corpusFolder = null;
-		this.targetFolder = null;
+		this.vocabulary = null;	
 		this.documentTermVectors = null;
 
 		List<String> lines = Util.readStream2List(givenCorpus);
@@ -226,14 +199,6 @@ public class EmotionAnalyzer {
 		}
 		return docuementFrequencies;
 	}
-	
-	private float[] calculateTfidf(DocumentContainer container, int[] documentTermVector,
-			int[] documentFrequencies ){
-		float[] tfidfWeights = new float[this.vocabulary.size];
-		for (int i = 0; i < this.vocabulary.size; i++)
-			tfidfWeights[i] = (float) Util.tfidf(documentTermVector[i], this.corpus.length, documentFrequencies[i]);
-		return tfidfWeights;
-	}
 
 	private float[] calculateTfidf(MemoryContainer container, int[] documentTermVector,
 			int[] documentFrequencies ){
@@ -250,61 +215,6 @@ public class EmotionAnalyzer {
 		calculateEmotionVector(container, fArray);
 	}
 	
-	private void calculateEmotionVector(DocumentContainer container, int[] documentTermVector) throws IOException {
-		float[] fArray = new float[documentTermVector.length];
-		for (int i = 0; i < documentTermVector.length; i++)
-			fArray[i] = (float) documentTermVector[i];
-		calculateEmotionVector(container, fArray);
-	}
-	
-	private void calculateEmotionVector(DocumentContainer container, float[] weightVector) throws IOException {
-		float[] projectedWeightVector = lexiconProjection(weightVector);
-		double valence = 0;
-		double arousal = 0;
-		double dominance = 0;
-		double sumOfWeights = 0;
-		for (int i = 0; i < this.vocabulary.size; i++){
-			valence += projectedWeightVector[i]*this.vocabularyEmotionMatrix[i][0];
-			arousal += projectedWeightVector[i]*this.vocabularyEmotionMatrix[i][1];
-			dominance += projectedWeightVector[i]*this.vocabularyEmotionMatrix[i][2];
-			sumOfWeights +=  projectedWeightVector[i];
-		}
-//		container.recognizedTokenCount = sumOfWeights; // Das musste ich hier leider rausnehmen, weil 
-														// das bei tfidf keinen sinn mehr gemacht hätte,
-														// stattdessen wird das jetzt woanders berechnet...
-		// if the number of recognized tokens is 0, normalisation is not possivle
-		if (sumOfWeights==0){
-			container.documentEmotionVector = new EmotionVector(0,0,0);
-			container.standardDeviationVector = new EmotionVector(0,0,0);
-		}
-		else{
-		EmotionVector emotionVector = new EmotionVector(valence, arousal, dominance);
-		emotionVector.normalize(sumOfWeights);
-		container.documentEmotionVector = emotionVector;
-		
-		//TODO Weiß nicht, ob das mit tfidf wirklich sinn macht...
-		//calcualte standarddev vector
-		//squared Deviation Valence
-		double sqDevValence = 0;
-		//squared Deviation Arousl
-		double sqDevArousal = 0;
-		//squared Deviation Dominance
-		double sqDevDominance = 0;
-		//calculate summed squared deviation from mean for VAD (which is the standard dev of all recognized emotion vectors)
-		for (int i = 0; i < this.vocabulary.size; i++){
-			if(vocabularyLexiconVector[i] == 1){
-				sqDevValence += projectedWeightVector[i] * Math.pow((emotionVector.getValence() - vocabularyEmotionMatrix[i][0]), 2);
-				sqDevArousal += projectedWeightVector[i] * Math.pow((emotionVector.getArousal() - vocabularyEmotionMatrix[i][1]), 2);
-				sqDevDominance += projectedWeightVector[i] * Math.pow((emotionVector.getDominance() - vocabularyEmotionMatrix[i][2]), 2);
-			}
-		}
-		EmotionVector sdVector = new EmotionVector(Math.sqrt(sqDevValence/sumOfWeights),Math.sqrt(sqDevArousal/sumOfWeights),Math.sqrt(sqDevDominance/sumOfWeights));
-		container.standardDeviationVector = sdVector;
-		}
-	}
-
-	
-
 	private void calculateEmotionVector(MemoryContainer container, float[] weightVector) throws IOException {
 		float[] projectedWeightVector = lexiconProjection(weightVector);
 		double valence = 0;
@@ -377,17 +287,6 @@ public class EmotionAnalyzer {
 		int index;
 		int[] documentTermVector = new int[this.vocabulary.size];
 		List<String> normalizedDocument = container.normalizedDocument;
-		for (String str: normalizedDocument){
-			index = this.vocabulary.getIndexByString(str);
-			documentTermVector[index]++;
-		}
-		return documentTermVector;
-	}
-
-	private int[] calculateDocumentTermVector(DocumentContainer container) throws IOException {
-		int index;
-		int[] documentTermVector = new int[this.vocabulary.size];
-		List<String> normalizedDocument = Files.readAllLines(container.normalizedDocument.toPath());
 		for (String str: normalizedDocument){
 			index = this.vocabulary.getIndexByString(str);
 			documentTermVector[index]++;

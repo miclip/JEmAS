@@ -36,7 +36,7 @@ public class Emotion {
   }
 
   public double getArousal() {
-    return valence;
+    return arousal;
   }
 
   public double getDominanceStdDev() {
