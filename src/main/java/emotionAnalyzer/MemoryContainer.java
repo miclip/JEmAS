@@ -65,6 +65,7 @@ public class MemoryContainer {
 		// document and the document-term-vector
 		this.document = givenDocument;
 		this.non_stopword_tokenCount = -1; 
+		this.tokenCount = -1;
 		this.documentTermVectors = givenDocumentTermVectors;
 	}
 
@@ -95,38 +96,6 @@ public class MemoryContainer {
 				+ df.format(this.recognizedTokenCount)	+	"\t"
 				+ df.format(this.numberCount));
 	}
-//	public void printData() {
-//	System.out.println(this.document.getName() + "\t" 	
-//			+ this.documentEmotionVector.getValence() + "\t"
-//			+ this.documentEmotionVector.getArousal() + "\t"
-//			+ this.documentEmotionVector.getDominance() + "\t"
-//			+ this.standardDeviationVector.getValence() + "\t"
-//			+ this.standardDeviationVector.getArousal() + "\t"
-//			+ this.standardDeviationVector.getDominance() + "\t"
-//			+ this.tokenCount + "\t"  
-//			+ this.alphabeticTokenCount + "\t"
-//			+ this.non_stopword_tokenCount + "\t"
-//			+ this.recognizedTokenCount	+	"\t"
-//			+ this.numberCount);
-//}
-	
-	
-
-	
-	/**
-	 * Number of tokens in the input text. Tokenization is done be Stanfords
-	 * PTBTokenizer.
-	 * @throws IOException 
-	 */
-	
-	// public void writeDocumentTermVector(int[] vec) throws IOException{
-	// 	FileWriter writer = new FileWriter(this.documentTermVector);
-	// 	for (int i: vec)
-	// 		writer.write(i +"\n");
-	// 	writer.close();
-	// }
-	
-	
 
 	public int getTokenCount() {
 		return tokenCount;

@@ -30,7 +30,7 @@ public class EmotionController {
         }        
     }
 
-    @RequestMapping(value="/emotion", method=RequestMethod.POST,consumes = "text/plain")
+    @RequestMapping(value="/emotion", method=RequestMethod.POST,consumes = "text/plain", produces="application/json")
     public Emotion[] emotion(HttpEntity<String> httpEntity) throws Exception{
 
         List<Emotion> emotions =new ArrayList<Emotion>();

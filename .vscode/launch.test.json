@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "JEmAS",
+                "projectName": "JEmAS",
+                "workingDirectory": "/Users/mlipscombe/machinelearning/JEmAS",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "JEmAS",
+                "projectName": "JEmAS",
+                "workingDirectory": "/Users/mlipscombe/machinelearning/JEmAS",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}

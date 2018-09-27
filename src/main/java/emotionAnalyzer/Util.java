@@ -137,21 +137,44 @@ public class Util {
 		
 	}
 
+	public static InputStream resource2Stream(String path) {
+		InputStream inputStream = null;
+		try {
+			inputStream = Util.class.getClassLoader().getResourceAsStream(path);	
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("\nFailed to find file in jar. Looked at path " + path );
+		}	
+		return inputStream;
+	}
+
 	public static BufferedReader resource2BufferedReader(String path) {
 		BufferedReader bReader = null;
 		try {
-			InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(path);		
+			InputStream inputStream = resource2Stream(path);		
 			InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
 			bReader = new BufferedReader(streamReader);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("\nFailed to find file in jar. Looked at path " + Util.getJarPath(path) );
+			System.out.println("\nFailed to read file in jar. Looked at path " + path );
 		}	
 		return bReader;
 	}
 
-	
-	
+	public static List<String> resource2List(String path){
+		List<String> list = new ArrayList<String>();
+		try {
+			BufferedReader in = Util.resource2BufferedReader(path);
+			String line = null;
+			while ((line = in.readLine()) != null) {
+				list.add(line);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("\nFailed to find StopwordFilter in jar. Looked at path " + path );
+		}
+		return list;
+	}
 	
 	public static void writeList2File(List<String> list, String path) throws IOException{
 		FileWriter writer = new FileWriter(path); 
@@ -181,33 +204,14 @@ public class Util {
 		}
 		
 		return result/sample.length;
-	}
-	
+	}	
 	
 	public final  static Settings defaultSettings = new Settings(Preprocessing.LEMMATIZE, false, "absolute");
 	public static final Settings settings_tokenize = new Settings(Preprocessing.TOKENIZE, false, "absolute");
 	public static final Settings settings_stem = new Settings(Preprocessing.STEM, false, "absolute");
-	public static final String TESTFILE ="src/emotionAnalyzer/testFile.txt";
-	public static final String TESTFILE2 ="src/emotionAnalyzer/testFile2.txt"; //(not normalized) Document vector should be (-8.43, -3.75, -7.04) using warriners (default) lexicon
-	public static final  String TESTFILE5 ="src/emotionAnalyzer/testFile5.txt";
-//	public static final String TESTFILE_STEM = "src/emotionAnalyzer/test.test.test.testFile_Stem.txt";
 	public static final  String DEFAULTLEXICON ="emotionAnalyzer/LexiconWarriner2013_transformed.txt";
-	public static final String DEFAULTLEXICON_JAR ="emotionAnalyzer/LexiconWarriner2013_transformed.txt";
 	public static final String TESTLEXICON="src/emotionAnalyzer/testLexicon.txt";
 	public static final String TESTFILE_LEMMA = "src/emotionAnalyzer/test.test.test.testFile_Lemma.txt";
 	public static final String TESTLEXICON_LEMMA = "src/emotionAnalyzer/testLexicon_Lemma.txt";
-//	public static final String TESTLEXICON_STEMMER = "src/emotionAnalyzer/testLexicon_Stemmer.txt";
-//	public static final String STOPWORDLIST_NLTK = "resources/NLTK_stopwords_English.txt";
-//	public static final String TESTFOLDER2 ="src/emotionAnalyzer/testFolder2";
-//	public static final String TESTFOLDER ="resources/testFolder";
 	public static final String STOPWORDLIST = "emotionAnalyzer/stopwords.txt";
-	public static final String TESTFILE4 = "src/emotionAnalyzer/testFile4.txt";
-	public static final String ACTUALOUTPUT ="target/actual_output.txt";
-	public static final String EXPECTEDOUTPUT ="src/emotionAnalyzer/expectedTestOutput.txt";
-	public static final String TARGETFOLDER = "target/";
-	public static final String TESTFILE3 = "src/emotionAnalyzer/testFile3.txt";
-	
-
-
-
 }

@@ -47,6 +47,10 @@ public class Emotion {
     return valenceStdDev;
   }
 
+  public double getArousalStdDev() {
+    return arousalStdDev;
+  }
+
   public int getTokens() {
     return tokens;
   }
